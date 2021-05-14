@@ -1,16 +1,17 @@
-import { Component } from 'react';
+import { Component, Suspense, lazy } from 'react';
 import { connect } from 'react-redux';
 import { Switch, Route } from 'react-router-dom';
 import Container from './Components/Container/Container';
 import AppBar from './Components/AppBar';
-import HomeView from './views/HomeView';
-import ContactsView from './views/ContactsView';
-import RegisterView from './views/RegisterView';
-import LoginView from './views/LoginView';
 import { authOperations } from './Redux/auth';
 import PrivateRoute from './Components/Routes/PrivateRoute';
 import PublicRoute from './Components/Routes/PublicRoute';
 import './styles.css';
+
+const HomeView = lazy(() => import('./views/HomeView'));
+const RegisterView = lazy(() => import('./views/RegisterView'));
+const LoginView = lazy(() => import('./views/LoginView'));
+const ContactsView = lazy(() => import('./views/ContactsView'));
 
 class App extends Component {
   componentDidMount() {
@@ -21,12 +22,14 @@ class App extends Component {
     return (
       <Container>
         <AppBar />
-        <Switch>
-          <Route exact path="/" component={HomeView} />
-          <PublicRoute restricted path="/register" component={RegisterView} />
-          <PublicRoute restricted path="/login" component={LoginView} />
-          <PrivateRoute path="/contacts" component={ContactsView} />
-        </Switch>
+        <Suspense fallback={<p>Loading...</p>}>
+          <Switch>
+            <Route exact path="/" component={HomeView} />
+            <PublicRoute restricted path="/register" component={RegisterView} />
+            <PublicRoute restricted path="/login" component={LoginView} />
+            <PrivateRoute path="/contacts" component={ContactsView} />
+          </Switch>
+        </Suspense>
       </Container>
     );
   }
